@@ -14,6 +14,9 @@ public class Vec2 {
     public Vec2 subtract(Vec2 other) {
         return new Vec2(x-other.x, y-other.y);
     }
+    public Vec2 sMultiply(int m) {
+        return new Vec2(x*m, y*m);
+    }
     public Vec2 hMultiply(Vec2 other) {
         return new Vec2(x*other.x, y*other.y);
     }
