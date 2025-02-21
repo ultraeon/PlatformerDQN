@@ -5,16 +5,19 @@ public class Vec2 {
         this.x = x;
         this.y = y;
     }
+    public String toString() {
+        return "("+x+", "+y+")";
+    }
     public Vec2 add(Vec2 other) {
         return new Vec2(x+other.x, y+other.y);
     }
     public Vec2 subtract(Vec2 other) {
         return new Vec2(x-other.x, y-other.y);
     }
-    public Vec2 hadamardMultiply(Vec2 other) {
+    public Vec2 hMultiply(Vec2 other) {
         return new Vec2(x*other.x, y*other.y);
     }
-    public int dotMultiply(Vec2 other) {
+    public int dMultiply(Vec2 other) {
         return x*other.x+y*other.y;
     }
 }
