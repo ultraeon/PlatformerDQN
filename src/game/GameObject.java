@@ -18,18 +18,27 @@ public class GameObject {
         int objRight = position.x + dimension.x;
         int objDown = position.y;
         int objUp = position.y + dimension.y;
-        boolean withinXBounds = (playLeft > objLeft && playLeft < objRight)
-        || (playRight < objRight && playRight > objLeft);
-        boolean withinYBounds = (playDown > objDown && playDown < objUp) 
-        || (playUp < objUp && playUp > objDown);
+        boolean withinXBounds = (playLeft >= objLeft && playLeft <= objRight)
+        || (playRight <= objRight && playRight >= objLeft);
+        boolean withinYBounds = (playDown >= objDown && playDown <= objUp) 
+        || (playUp <= objUp && playUp >= objDown);
         return withinXBounds && withinYBounds;
     }
-    public int getXDisplacement(Vec2 playerPos) {
+    public Vec2 getDisplacement(Vec2 playerPos) {
         int playLeft = playerPos.x;
         int playRight = playerPos.x+Player.DIMENSION.x;
+        int playDown = playerPos.y;
+        int playUp = playerPos.y + Player.DIMENSION.y;
         int objLeft = position.x;
         int objRight = position.x + dimension.x;
-        int x = -1*Math.max(playRight-objLeft, 0);
-        return x;
+        int objDown = position.y;
+        int objUp = position.y + dimension.y;
+        
+        int xLeft = playRight-objLeft;
+        int yDown = playUp-objDown;
+        int xRight = objRight-playLeft;
+        if(xLeft < xRight && xLeft < yDown) return new Vec2(-1*xLeft, 0);
+        else if(xRight < xLeft && xRight < yDown) return new Vec2(xRight, 0);
+        else return new Vec2(0, -1*yDown);
     }
 }
