@@ -1,5 +1,5 @@
 public class Player {
-    public static final Vec2 DIMENSIONS = new Vec2(1000, 1000);
+    public static final Vec2 DIMENSION = new Vec2(1000, 1000);
     //(xUnits/tick^2, yUnits/tick^2)
     public static final Vec2 MOVE_ACCEL = new Vec2(5, 0);
     public static final Vec2 JUMP_ACCEL = new Vec2(0, 500);
