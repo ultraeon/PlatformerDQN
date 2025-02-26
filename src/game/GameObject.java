@@ -34,6 +34,8 @@ public class GameObject {
         int objDown = position.y;
         int objUp = position.y + dimension.y;
         
+        int yUp = objUp-playDown;
+        if(yUp < Player.SNAP_UP_THRESHOLD) return new Vec2(0, yUp);
         int xLeft = playRight-objLeft;
         int yDown = playUp-objDown;
         int xRight = objRight-playLeft;
