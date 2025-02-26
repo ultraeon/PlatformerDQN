@@ -2,8 +2,8 @@ public class Player {
     public static final Vec2 DIMENSION = new Vec2(1000, 1000);
     //(xUnits/tick^2, yUnits/tick^2)
     public static final Vec2 MOVE_ACCEL = new Vec2(5, 0);
-    public static final Vec2 JUMP_ACCEL = new Vec2(0, 500);
-    public static final Vec2 GRAV_ACCEL = new Vec2(0, -20);
+    public static final Vec2 JUMP_ACCEL = new Vec2(0, 250);
+    public static final Vec2 GRAV_ACCEL = new Vec2(0, -15);
     public static final int SNAP_UP_THRESHOLD = 1000;
     //(xUnits/tick, yUnits/tick)
     Vec2 velocity;
