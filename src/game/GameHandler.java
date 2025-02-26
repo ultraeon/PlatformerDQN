@@ -11,6 +11,19 @@ public class GameHandler {
     public String toString() {
         return player.toString();
     }
+    public Vec2 getPosition() {
+        return player.position;
+    }
+    public int getCamCollision(int x, int y) {
+        if(player.camCollisionCheck(x, y)) return 3;
+        for(GameObject gameObj : gameObjList) {
+            if(gameObj.camCollisionCheck(x, y)) {
+                if(gameObj.isDeathPlane) return 2;
+                return 1;
+            }
+        }
+        return 0;
+    }
     public boolean doTick(boolean[] input) {
         player.handleVelocity(input);
         player.handlePosition();
