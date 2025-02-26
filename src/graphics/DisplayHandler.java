@@ -11,7 +11,7 @@ public class DisplayHandler {
     }
     public int[][] getPixelBuffer() {
         int xPosition = game.getPosition().x+500;
-        int yPosition = game.getPosition().y+5000;
+        int yPosition = game.getPosition().y+4000;
         int[][] pBuffer = new int[xResolution][yResolution];
         int camX, camY;
         for(int i = 0; i < xResolution; i++) {
@@ -25,7 +25,7 @@ public class DisplayHandler {
     }
     public String toString() {
         int[][] pBuffer = getPixelBuffer();
-        String s = "";
+        String s = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
         for(int i = xResolution-1; i > -1; i--) {
             for(int j = 0; j < yResolution; j++) {
                 switch(pBuffer[j][i]) {
