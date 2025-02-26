@@ -26,8 +26,8 @@ public class DisplayHandler {
     public String toString() {
         int[][] pBuffer = getPixelBuffer();
         String s = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-        for(int i = xResolution-1; i > -1; i--) {
-            for(int j = 0; j < yResolution; j++) {
+        for(int i = yResolution-1; i > -1; i--) {
+            for(int j = 0; j < xResolution; j++) {
                 switch(pBuffer[j][i]) {
                     case 0: s+=" "; break;
                     case 1: s+="o"; break;
