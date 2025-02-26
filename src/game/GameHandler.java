@@ -8,6 +8,9 @@ public class GameHandler {
         gameObjList = new ArrayList<GameObject>();
         gameObjList.add(new GameObject(new Vec2(-500000, -10000), new Vec2(1000000, 10000)));
     }
+    public void addObject(GameObject o) {
+        gameObjList.add(o);
+    }
     public String toString() {
         return player.toString();
     }
@@ -15,13 +18,13 @@ public class GameHandler {
         return player.position;
     }
     public int getCamCollision(int x, int y) {
-        if(player.camCollisionCheck(x, y)) return 3;
         for(GameObject gameObj : gameObjList) {
             if(gameObj.camCollisionCheck(x, y)) {
                 if(gameObj.isDeathPlane) return 2;
                 return 1;
             }
         }
+        if(player.camCollisionCheck(x, y)) return 3;
         return 0;
     }
     public boolean doTick(boolean[] input) {
