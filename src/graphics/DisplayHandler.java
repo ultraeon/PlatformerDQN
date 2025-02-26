@@ -1,22 +1,24 @@
 public class DisplayHandler {
     GameHandler game;
-    int resolution;
-    public static final int CAMERA_RANGE = 10000;
-    public DisplayHandler(GameHandler g, int res) {
+    int xResolution;
+    int yResolution;
+    public static final int CAMERA_X_RANGE = 10000;
+    public static final int CAMERA_Y_RANGE = 14000;
+    public DisplayHandler(GameHandler g, int xRes, int yRes) {
         game = g;
-        resolution = res;
+        xResolution = xRes;
+        yResolution = yRes;
     }
     public int[][] getPixelBuffer() {
-        int xPosition = game.getPosition().x;
-        int yPosition = game.getPosition().y;
-        int[][] pBuffer = new int[resolution][resolution];
+        int xPosition = game.getPosition().x+500;
+        int yPosition = game.getPosition().y+5000;
+        int[][] pBuffer = new int[xResolution][yResolution];
         int camX, camY;
-        for(int i = 0; i < resolution; i++) {
-            for(int j = 0; j < resolution; j++) {
-                camX = i*CAMERA_RANGE/resolution+xPosition-CAMERA_RANGE/2;
-                camY = j*CAMERA_RANGE/resolution+yPosition-CAMERA_RANGE/2;
+        for(int i = 0; i < xResolution; i++) {
+            for(int j = 0; j < yResolution; j++) {
+                camX = i*CAMERA_X_RANGE/xResolution+xPosition-CAMERA_X_RANGE/2;
+                camY = j*CAMERA_Y_RANGE/yResolution+yPosition-CAMERA_Y_RANGE/2;
                 pBuffer[i][j] = game.getCamCollision(camX, camY);
-                System.out.println(camX + " " + camY);
             }
         }
         return pBuffer;
@@ -24,8 +26,8 @@ public class DisplayHandler {
     public String toString() {
         int[][] pBuffer = getPixelBuffer();
         String s = "";
-        for(int i = resolution-1; i > -1; i--) {
-            for(int j = 0; j < resolution; j++) {
+        for(int i = xResolution-1; i > -1; i--) {
+            for(int j = 0; j < yResolution; j++) {
                 switch(pBuffer[j][i]) {
                     case 0: s+=" "; break;
                     case 1: s+="o"; break;
