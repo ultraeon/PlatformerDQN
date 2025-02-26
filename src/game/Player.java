@@ -3,13 +3,14 @@ public class Player {
     //(xUnits/tick^2, yUnits/tick^2)
     public static final Vec2 MOVE_ACCEL = new Vec2(5, 0);
     public static final Vec2 JUMP_ACCEL = new Vec2(0, 500);
-    public static final Vec2 GRAV_ACCEL = new Vec2(0, -10);
+    public static final Vec2 GRAV_ACCEL = new Vec2(0, -20);
+    public static final int SNAP_UP_THRESHOLD = 1000;
     //(xUnits/tick, yUnits/tick)
-    private Vec2 velocity;
+    Vec2 velocity;
     //(xUnits, yUnits)
-    private Vec2 position;
+    Vec2 position;
     // 0-freefall 1-grounded 2-dead
-    private int state;
+    int state;
     public Player() {
         position = new Vec2(0, 0);
         velocity = new Vec2(0, 0);
