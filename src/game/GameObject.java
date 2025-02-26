@@ -8,6 +8,13 @@ public class GameObject {
         isTangible = true;
         isDeathPlane = false;
     }
+    public boolean camCollisionCheck(int x, int y) {
+        int objLeft = position.x;
+        int objRight = position.x + dimension.x;
+        int objDown = position.y;
+        int objUp = position.y + dimension.y;
+        return x >= objLeft && x <= objRight && y >= objDown && y <= objUp;
+    }
     public boolean collisionCheck(Vec2 playerPos) {
         if(!isTangible) return false;
         int playLeft = playerPos.x;
