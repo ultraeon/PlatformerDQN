@@ -21,6 +21,13 @@ public class Player {
         s += "\nPosition: "+position.toString();
         return s + "\nVelocity: "+velocity.toString();
     }
+    public boolean camCollisionCheck(int x, int y) {
+        int playLeft = position.x;
+        int playRight = position.x + DIMENSION.x;
+        int playDown = position.y;
+        int playUp = position.y + DIMENSION.y;
+        return x >= playLeft && x <= playRight && y >= playDown && y <= playUp;
+    }
     // index 0> 1< 2^
     public void handleVelocity(boolean[] input) {
         if(input[0] && state != 2) velocity = velocity.add(MOVE_ACCEL);
