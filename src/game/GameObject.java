@@ -49,14 +49,13 @@ public class GameObject {
         int objUp = position.y + dimension.y;
 
         // chooses whatever movement is the smallest to push the player
-        int yUp = objUp-playDown;
-        // TODO treat yUP like all others
-        if(yUp < Player.SNAP_UP_THRESHOLD) return new Vec2(0, yUp);
-        int xLeft = playRight-objLeft;
-        int yDown = playUp-objDown;
-        int xRight = objRight-playLeft;
-        if(xLeft < xRight && xLeft < yDown) return new Vec2(-1*xLeft, 0);
-        else if(xRight < xLeft && xRight < yDown) return new Vec2(xRight, 0);
-        else return new Vec2(0, -1*yDown);
+        int yUp = objUp-playDown+1;
+        int xLeft = playRight-objLeft+1;
+        int yDown = playUp-objDown+1;
+        int xRight = objRight-playLeft+1;
+        if(xLeft < xRight && xLeft < yDown && xLeft < yUp) return new Vec2(-1*xLeft, 0);
+        else if(xRight < yDown && xRight < yUp) return new Vec2(xRight, 0);
+        else if(yDown < yUp) return new Vec2(0, -1*yDown);
+        else return new Vec2(0, yUp);
     }
 }
