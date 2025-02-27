@@ -2,8 +2,8 @@ public class DisplayHandler {
     GameHandler game;
     int xResolution;
     int yResolution;
-    public static final int CAMERA_X_RANGE = 10000;
-    public static final int CAMERA_Y_RANGE = 14000;
+    public static final int CAMERA_X_RANGE = 14000;
+    public static final int CAMERA_Y_RANGE = 10000;
     public DisplayHandler(GameHandler g, int xRes, int yRes) {
         game = g;
         xResolution = xRes;
@@ -11,7 +11,7 @@ public class DisplayHandler {
     }
     public int[][] getPixelBuffer() {
         int xPosition = game.getPosition().x+500;
-        int yPosition = game.getPosition().y+4000;
+        int yPosition = game.getPosition().y+3000;
         int[][] pBuffer = new int[xResolution][yResolution];
         int camX, camY;
         for(int i = 0; i < xResolution; i++) {
@@ -26,9 +26,9 @@ public class DisplayHandler {
     public String toString() {
         int[][] pBuffer = getPixelBuffer();
         String s = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
-        for(int i = yResolution-1; i > -1; i--) {
-            for(int j = 0; j < xResolution; j++) {
-                switch(pBuffer[j][i]) {
+        for(int j = yResolution-1; j > -1; j--) {
+            for(int i = 0; i < xResolution; i++) {
+                switch(pBuffer[i][j]) {
                     case 0: s+=" "; break;
                     case 1: s+="o"; break;
                     case 2: s+="/"; break;
