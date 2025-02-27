@@ -6,8 +6,7 @@ public class Player {
     public static final Vec2 MOVE_ACCEL = new Vec2(3, 0);
     public static final Vec2 JUMP_ACCEL = new Vec2(0, 350);
     public static final Vec2 GRAV_ACCEL = new Vec2(0, -15);
-    // TODO add Friction Accel
-    public static final int SNAP_UP_THRESHOLD = 1000;
+    public static final Vec2 FRIC_ACCEL = new Vec2(10, 0);
     // velocity vector as <xUnits/tick, yUnits/tick>
     Vec2 velocity;
     // position vector as <xUnits, yUnits>
@@ -42,8 +41,14 @@ public class Player {
             velocity = velocity.add(JUMP_ACCEL);
             state = 0;
         }
+        
         // adds gravity if player is in freefall
         if(state == 0) velocity = velocity.add(GRAV_ACCEL);
+        else if(state == 1 && !input[0] && !input[1]) {
+            if(velocity.x > FRIC_ACCEL.x) velocity.add(FRIC_ACCEL.sMultiply(-1));
+            else if(velocity.x < -1*FRIC_ACCEL.x) velocity.add(FRIC_ACCEL);
+            else velocity.x = 0;
+        }
         // x-velocity bounded in [-200, 200] y-velocity bounded in [-500, 500]
         velocity.x = Math.min(velocity.x, 200);
         velocity.x = Math.max(velocity.x, -200);
