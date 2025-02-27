@@ -41,7 +41,7 @@ public class GameHandler {
                     player.position.x += displacement.x;
                     player.velocity.x = 0;
                 }
-                else {
+                else if(displacement.x == 0){
                     player.position.y += displacement.y;
                     player.velocity.y = 0;
                     if(displacement.y > 0) player.state = 1;
