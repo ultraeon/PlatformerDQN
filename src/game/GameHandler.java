@@ -28,6 +28,7 @@ public class GameHandler {
         return 0;
     }
     public boolean doTick(boolean[] input) {
+        if(player.state == 2) return false;
         player.handleVelocity(input);
         player.handlePosition();
         for(GameObject gameObj : gameObjList) {
