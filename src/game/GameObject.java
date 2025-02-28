@@ -8,8 +8,8 @@ public class GameObject {
         dimension = d;
         position = p;
         // default state
-        isVisible = true;
-        isTangible = true;
+        isVisible = false;
+        isTangible = false;
         isDeathPlane = false;
     }
     // determines whether a point is contained within the object(for rasterization)
