@@ -43,6 +43,8 @@ public class Player {
         }
         
         // adds gravity if player is in freefall
+        // adds friction if player isn't accelerating on the ground
+        // TODO implement friction that scales with velocity
         if(state == 0) velocity = velocity.add(GRAV_ACCEL);
         else if(state == 1 && !input[0] && !input[1]) {
             if(velocity.x > FRIC_ACCEL.x) velocity.add(FRIC_ACCEL.sMultiply(-1));
