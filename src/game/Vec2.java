@@ -1,7 +1,8 @@
+package game;
 // class for a vector of length 2 -> <x, y>
 public class Vec2 {
-    int x;
-    int y;
+    public int x;
+    public int y;
     public Vec2(int x, int y) {
         this.x = x;
         this.y = y;

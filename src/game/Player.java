@@ -1,3 +1,5 @@
+package game;
+
 // class representing the player
 public class Player {
     // important constants for global access

@@ -1,3 +1,6 @@
+package graphics;
+import game.GameHandler;
+
 public class DisplayHandler {
     GameHandler game;
     int xResolution;

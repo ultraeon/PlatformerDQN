@@ -1,3 +1,4 @@
+package game;
 import java.util.ArrayList;
 
 // class to handle internals of the game

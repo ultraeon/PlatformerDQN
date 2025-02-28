@@ -1,3 +1,5 @@
+package game;
+
 // class representing an object that's not the player
 public class GameObject {
     // vectors for size and location
