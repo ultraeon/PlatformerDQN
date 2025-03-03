@@ -1,0 +1,8 @@
+/.idea/
+/.vs/
+/src/main/resources
+/target/
+*.iml
+*build.properties
+*.project
+*.classpath
