@@ -36,11 +36,14 @@ public class Player {
         return x >= playLeft && x <= playRight && y >= playDown && y <= playUp;
     }
     // input is whether arrow keys have been pressed in the form [>, <, ^] 
-    public void handleVelocity(boolean[] input) {
+    public void handleVelocity(int input) {
+        boolean rPressed = (input & 1) == 1;
+        boolean lPressed = (input>>1 & 1) == 1;
+        boolean uPressed = (input>>2 & 1) == 1;
         // changes velocity based on input
-        if(input[0] && state != 2) velocity = velocity.add(MOVE_ACCEL);
-        if(input[1] && state != 2) velocity = velocity.add(MOVE_ACCEL.sMultiply(-1));
-        if(input[2] && state == 1) {
+        if(rPressed && state != 2) velocity = velocity.add(MOVE_ACCEL);
+        if(lPressed && state != 2) velocity = velocity.add(MOVE_ACCEL.sMultiply(-1));
+        if(uPressed && state == 1) {
             velocity = velocity.add(JUMP_ACCEL);
             state = 0;
         }

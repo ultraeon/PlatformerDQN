@@ -1,29 +1,24 @@
 import game.*;
 import graphics.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Main {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         GameHandler game = new GameHandler();
         DisplayHandler d = new DisplayHandler(game, 60, 30);
-        int[][] test = new int[30][5];
-        for(int i = 0; i < 30; i++) {
-            test[i][0] = (int)(Math.random()*100000);
-            test[i][1] = (int)(Math.random()*4000)+1000;
-            test[i][2] = (int)(Math.random()*2000)+1000;
-            test[i][3] = (int)(Math.random()*2000)+1000;
-            test[i][4] = 3;
-        }
-        game.loadObjects(test);
-        for(int i = 0; i < 150; i++) {
+        File f = new File("levels/test.txt");
+        int[][] allObjects = TextFileConverter.txtToIntArray(f);
+        game.loadObjects(allObjects);
+        for(int i = 0; i < 95; i++) {
             System.out.println(d);
             Thread.sleep(17);
-            game.doTick(new boolean[]{true, false, false});
+            game.doTick(6);
         }
-        Thread.sleep(1000);
-        for(int i = 0; i < 150; i++) {
+        for(int i = 0; i < 450; i++) {
             System.out.println(d);
             Thread.sleep(17);
-            game.doTick(new boolean[]{false, false, false});
+            game.doTick(5);
         }
     }
 }

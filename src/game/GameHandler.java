@@ -45,7 +45,7 @@ public class GameHandler {
         if(player.camCollisionCheck(x, y)) return 3;
         return 0;
     }
-    public boolean doTick(boolean[] input) {
+    public boolean doTick(int input) {
         if(player.state == 2) return false;
         player.handleVelocity(input);
         player.handlePosition();
