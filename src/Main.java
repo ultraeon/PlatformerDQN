@@ -20,10 +20,30 @@ public class Main {
             Thread.sleep(17);
             if(!game.doTick(0b000)) break;
         }
-        for(int i = 0; i < 100000; i++) {
+        for(int i = 0; i < 200; i++) {
             System.out.println(d);
             Thread.sleep(17);
             if(!game.doTick(0b101)) break;
+        }
+        for(int i = 0; i < 100; i++) {
+            System.out.println(d);
+            Thread.sleep(17);
+            if(!game.doTick(0b001)) break;
+        }
+        for(int i = 0; i < 85; i++) {
+            System.out.println(d);
+            Thread.sleep(17);
+            if(!game.doTick(0b101)) break;
+        }
+        for(int i = 0; i < 15; i++) {
+            System.out.println(d);
+            Thread.sleep(17);
+            if(!game.doTick(0b110)) break;
+        }
+        for(int i = 0; i < 50; i++) {
+            System.out.println(d);
+            Thread.sleep(17);
+            if(!game.doTick(0b001)) break;
         }
     }
 }
