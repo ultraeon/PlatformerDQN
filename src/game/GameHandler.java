@@ -5,8 +5,9 @@ import java.util.ArrayList;
 public class GameHandler {
     private ArrayList<GameObject> gameObjList;
     private Player player;
-    public GameHandler() {
+    public GameHandler(int x, int y) {
         player = new Player();
+        player.position = new Vec2(x, y);
         gameObjList = new ArrayList<GameObject>();
         gameObjList.add(new GameObject(new Vec2(-500000, -10000), new Vec2(1000000, 10000)));
         gameObjList.get(0).isVisible = true;
@@ -47,6 +48,18 @@ public class GameHandler {
     }
     public boolean doTick(int input) {
         if(player.state == 2) return false;
+        player.state = 0;
+        boolean bFlag = false;
+        for(int i = 0; i < 1001; i += 200) {
+            for(GameObject gameObj : gameObjList) {
+                if(!gameObj.isVisible) continue;
+                if(gameObj.camCollisionCheck(player.position.x+i, player.position.y-1)) {
+                    player.state = 1;
+                    break;
+                }
+            }
+            if(bFlag) break;
+        }
         player.handleVelocity(input);
         player.handlePosition();
         for(GameObject gameObj : gameObjList) {

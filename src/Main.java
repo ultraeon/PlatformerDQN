@@ -5,20 +5,25 @@ import java.io.FileNotFoundException;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
-        GameHandler game = new GameHandler();
+        GameHandler game = new GameHandler(1000, 11000);
         DisplayHandler d = new DisplayHandler(game, 60, 30);
-        File f = new File("levels/test.txt");
+        File f = new File("levels/the_tower.txt");
         int[][] allObjects = TextFileConverter.txtToIntArray(f);
         game.loadObjects(allObjects);
-        for(int i = 0; i < 95; i++) {
+        for(int i = 0; i < 250; i++) {
             System.out.println(d);
             Thread.sleep(17);
-            game.doTick(6);
+            if(!game.doTick(0b101)) break;
         }
-        for(int i = 0; i < 450; i++) {
+        for(int i = 0; i < 100; i++) {
             System.out.println(d);
             Thread.sleep(17);
-            game.doTick(5);
+            if(!game.doTick(0b000)) break;
+        }
+        for(int i = 0; i < 100000; i++) {
+            System.out.println(d);
+            Thread.sleep(17);
+            if(!game.doTick(0b101)) break;
         }
     }
 }
