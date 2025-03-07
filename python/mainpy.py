@@ -30,17 +30,26 @@ class DQN(nn.Module):
 
     def __init__(self, width_observations, height_observations, n_actions):
         super(DQN, self).__init__()
-        self.layer1 = nn.Conv2D(1, 8, (3, 3), padding=1)
-        self.layer2 = nn.Conv2D(8, 8, (3, 3), padding=1)
-        self.layer3 = nn.Linear(width_observations*height_observations*8, 128)
-        self.layer4 = nn.Linear(128, 128)
-        self.layer5 = nn.Linear(128, 128)
-        self.layer6 = nn.Linear(128, n_actions)
+        self.main = torch.nn.Sequential(
+            nn.Conv2D(1, 8, (3, 3), padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d((2, 2)),
+            nn.Conv2D(8, 4, (3, 3), padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d((2, 2)),
+            nn.Flatten(),
+
+            nn.Linear((width_observations*height_observations)/4, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, 128),
+            nn.ReLU(),
+            nn.Linear(128, n_actions)
 
     def forward(self, x):
-        x = F.relu(self.layer1(x))
-        x = F.relu(self.layer2(x))
-        return self.layer3(x)
+        ret = self.main(x)
+        return ret
 
 is_ipython = 'inline' in matplotlib.get_backend()
 if is_ipython:
@@ -89,8 +98,7 @@ def select_action(state):
         with torch.no_grad():
             return policy_net(state).max(1).indices.view(1, 1)
     else:
-        #TODO add random input selection
-        #return torch.tensor(...)
+        return torch.tensor([[0, 1, 2, 3, 4, 5]], device=device, dtype=torch.long)
 
 def plot_durations(show_result=False):
     plt.figure(1)
@@ -148,12 +156,14 @@ def optimize_model():
 num_episodes = 200
 
 for i_episode in range(num_episodes):
-    #TODO set game to base state
+    env.reset()
+    state = env.getState()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
     for t in count():
         action = select_action(state)
-        #TODO advance game based on action
-        #TODO get next state, whether game terminated, and reward
+        reward = env.doTick(action)
+        terminated = reward == -50
+        observation = env.getState()
         reward = torch.tensor([reward], device=device)
 
         if terminated:

@@ -18,4 +18,9 @@ public class EnvironmentInfo {
     public int[][] getState() {
         return display.getPixelBuffer();
     }
+    public int doTick(int input) {
+        int p1 = game.getPosition().x;
+        if(!game.doTick(input)) return -50;
+        return game.getPosition().x-p1;
+    }
 }
