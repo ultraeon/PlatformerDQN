@@ -14,7 +14,6 @@ public final class TextFileConverter {
             for(int i = 0; i < 5; i++) {
                 currObj[i] = s.nextInt();
             }
-            System.out.println();
             initResult.add(currObj);
             s.nextLine();
         }

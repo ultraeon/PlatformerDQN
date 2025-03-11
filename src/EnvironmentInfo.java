@@ -1,11 +1,13 @@
-import game;
-import graphics;
+import game.*;
+import graphics.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 public class EnvironmentInfo {
     int[][] objects;
     GameHandler game;
     DisplayHandler display;
-    public EnvironmentInfo() {
+    public EnvironmentInfo() throws FileNotFoundException {
         File f = new File("levels/the_tower.txt");
         objects = TextFileConverter.txtToIntArray(f);
         reset();

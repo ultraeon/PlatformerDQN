@@ -45,7 +45,7 @@ class DQN(nn.Module):
             nn.ReLU(),
             nn.Linear(128, 128),
             nn.ReLU(),
-            nn.Linear(128, n_actions)
+            nn.Linear(128, n_actions))
 
     def forward(self, x):
         ret = self.main(x)
@@ -73,7 +73,7 @@ env = gateway.entry_point
 
 # left still right left-jump still-jump right-jump
 n_actions = 6
-
+#ERROR can't connect to java server
 state = env.getState()
 width_observations = len(state)
 height_observations = len(state[0])
