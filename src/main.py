@@ -108,12 +108,12 @@ class GameObject():
 
 class GameHandler():
     
-    def GameHandler(self, x, y):
-        player = Player()
-        player.posX = x
-        player.posY = y
-        gameObjList = []
-        gameObjList.add(GameObject(-500000, -10000, 1000000, 10000, True, True))
+    def __init__(self, x=0, y=0):
+        self.player = Player()
+        self.player.posX = x
+        self.player.posY = y
+        self.gameObjList = []
+        self.gameObjList.append(GameObject(-500000, -10000, 1000000, 10000, True, True))
 
     def loadObjsFromText(self, filepath):
         with open(filepath, 'r') as file:
@@ -182,9 +182,9 @@ class DisplayHandler():
         self.yRange = yRange
 
     def getPixelBuffer(self):
-        xPosition = self.game.player.x+500
-        yPosition = self.game.player.y+3000
-        pBuffer = ((0 for i in range(0, self.yResolution)) for i in range(0, self.xResolution))
+        xPosition = self.game.player.posX+500
+        yPosition = self.game.player.posY+3000
+        pBuffer = [[0 for i in range(0, self.yResolution)] for i in range(0, self.xResolution)]
         for i in range(0, self.xResolution):
             for j in range(0, self.yResolution):
                 camX = i*self.xRange/self.xResolution+xPosition-self.xRange/2
@@ -192,7 +192,7 @@ class DisplayHandler():
                 pBuffer[i][j] = self.game.getCamCollision(camX, camY)
         return pBuffer
 
-    def displayInConsole(self):
+    def getStringDisplay(self):
         pBuffer = self.getPixelBuffer()
         s = "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
         for j in range(self.yResolution-1, -1, -1):
@@ -224,7 +224,11 @@ class EnvironmentInfo():
         return self.display.getPixelBuffer()
 
     def doTick(self, input):
-        p1 = self.game.player.x
+        p1 = self.game.player.posX
         if not self.game.doTick(input):
             return -50
-        return self.game.player.x-p1
+        return self.game.player.posX-p1
+    
+game = GameHandler()
+display = DisplayHandler(game)
+print(display.getStringDisplay())
