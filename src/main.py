@@ -2,8 +2,6 @@
 import math
 import time
 import random
-import matplotlib
-import matplotlib.pyplot as plt
 from collections import namedtuple, deque
 from itertools import count
 
@@ -63,7 +61,7 @@ class Player():
 
 class GameObject():
 
-    def __init__(self, x, y, width, height, is_visible=False, is_tangible=False, is_death_plane=False):
+    def __init__(self, x, y, width, height, is_visible=False, is_tangible=False, is_death_plane=False, is_winpad=False):
         self.x = x
         self.y = y
         self.width = width
@@ -71,6 +69,7 @@ class GameObject():
         self.is_visible = is_visible
         self.is_tangible = is_tangible
         self.is_death_plane = is_death_plane
+        self.is_winpad = is_winpad
 
     def point_collision_check(self, point_x, point_y):
         object_left = self.x
@@ -133,7 +132,8 @@ class GameHandler():
                 is_visible = int(object_values[4]) & 1 == 1
                 is_tangible = (int(object_values[4]) >> 1) & 1
                 is_death_plane = (int(object_values[4]) >> 2) & 1
-                object = GameObject(int(object_values[0]), int(object_values[1]), int(object_values[2]), int(object_values[3]), is_visible, is_tangible, is_death_plane)
+                is_winpad = (int(object_values[4]) >> 3) & 1
+                object = GameObject(int(object_values[0]), int(object_values[1]), int(object_values[2]), int(object_values[3]), is_visible, is_tangible, is_death_plane, is_winpad)
                 self.game_objects.append(object)
 
     def get_pixel_value(self, x, y):
@@ -143,19 +143,22 @@ class GameHandler():
             if object.point_collision_check(x, y):
                 if object.is_death_plane:
                     return 2
+                elif object.is_winpad:
+                    return 4
                 return 1
         if self.player.point_collision_check(x, y):
             return 3
         return 0
     
+    # 0 - death 1 - normal 2 - win
     def do_game_tick(self, input):
         if self.player.state == 2:
-            return False
+            return 0
         self.player.state = 0
         break_flag = False
         for i in range(0, 1001, 200):
             for object in self.game_objects:
-                if not object.is_visible:
+                if not object.is_visible and not object.is_winpad:
                     continue
                 if object.point_collision_check(self.player.position_x+i, self.player.position_y-1):
                     self.player.state = 1
@@ -169,7 +172,10 @@ class GameHandler():
             if object.player_collision_check(self.player.position_x, self.player.position_y):
                 if object.is_death_plane:
                     self.player.state = 2
-                    return False
+                    return 0
+                elif object.is_winpad:
+                    self.player.state = 2
+                    return 2
                 player_displacement = object.get_player_displacement(self.player.position_x, self.player.position_y)
                 if(player_displacement[1] == 0):
                     self.player.position_x += player_displacement[0]
@@ -217,6 +223,8 @@ class DisplayHandler():
                         return_string += "/"
                     case 3:
                         return_string += "z"
+                    case 4:
+                        return_string += "$"
             return_string += "\n"
         return return_string
 
@@ -238,9 +246,12 @@ class Environment():
     def do_game_tick(self, input):
         # reward function
         original_player_x = self.game.player.position_x
-        if not self.game.do_game_tick(input):
-            return -50
-        return self.game.player.position_x-original_player_x
+        result = self.game.do_game_tick(input)
+        if result == 0:
+            return (-5000, True)
+        elif result == 2:
+            return (5000, True)
+        return (self.game.player.position_x-original_player_x, False)
     
     def get_display(self):
         return self.display.get_string_display()
@@ -263,37 +274,33 @@ class ReplayMemory(object):
 # The model itself
 class DQN(nn.Module):
 
-    def __init__(self, width_observations, height_observations, n_actions):
+    def __init__(self, n_actions):
         super(DQN, self).__init__()
-        self.main = torch.nn.Sequential(
-            nn.Conv2d(1, 8, (3, 3), padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d((2, 2)),
-            nn.Conv2d(8, 4, (3, 3), padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d((2, 2)),
-            nn.Flatten(start_dim=0),
-
-            nn.LazyLinear(128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, 128),
-            nn.ReLU(),
-            nn.Linear(128, n_actions))
+        self.conv1 = nn.Conv2d(1, 8, 3)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.conv2 = nn.Conv2d(8, 4, 3)
+        self.linear1 = nn.LazyLinear(128)
+        self.linear2 = nn.Linear(128, 128)
+        self.linear3 = nn.Linear(128, 128)
+        self.linear4 = nn.Linear(128, n_actions)
 
     def forward(self, x):
-        ret = self.main(x)
-        return ret
+        x = self.pool(F.relu(self.conv1(x)))
+        x = self.pool(F.relu(self.conv2(x)))
+        x = torch.flatten(x, 1)
+        x = F.relu(self.linear1(x))
+        x = F.relu(self.linear2(x))
+        x = F.relu(self.linear3(x))
+        x = self.linear4(x)
+        return x
 
-plt.ion()
 device = torch.device("cpu")
 
 Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'))
 
 BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 0.9
+EPS_START = 0.90
 EPS_END = 0.05
 EPS_DECAY = 1000
 TAU = 0.005
@@ -306,12 +313,10 @@ env = Environment("levels/test.txt")
 n_actions = 6
 
 state = env.get_state()
-state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
-width_observations = len(state)
-height_observations = len(state[0])
+state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(1)
 
-policy_net = DQN(width_observations, height_observations, n_actions).to(device)
-target_net = DQN(width_observations, height_observations, n_actions).to(device)
+policy_net = DQN(n_actions).to(device)
+target_net = DQN(n_actions).to(device)
 
 target_net.load_state_dict(policy_net.state_dict())
 policy_net.forward(state)
@@ -321,40 +326,22 @@ optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
 memory = ReplayMemory(10000)
 
 steps_done = 0
-episode_durations = []
+is_random_action = False
 
 def select_action(state):
     global steps_done
+    global is_random_action
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START-EPS_END) * \
         math.exp(-1*steps_done/EPS_DECAY)
     steps_done += 1
     if sample > eps_threshold:
         with torch.no_grad():
-            ret = torch.tensor(policy_net(state).argmax().item(), (1,))
-            print(ret)
-            return ret
+            is_random_action = False
+            return policy_net(state).max(1).indices.view(1, 1)
     else:
-        return torch.randint(0, 6, (1,), device=device, dtype=torch.long)
-
-def plot_durations(show_result=False):
-    plt.figure(1)
-    durations_t = torch.tensor(episode_durations, dtype=torch.float)
-    if show_result:
-        plt.title=('Result')
-    else:
-        plt.clf()
-        plt.title('Training')
-    plt.xlabel('Episode')
-    plt.ylabel('Duration')
-    plt.plot(durations_t.numpy())
-
-    if len(durations_t) >= 100:
-        means = durations_t.unfold(0, 100, 1).mean(1).view(-1)
-        means = torch.cat((torch.zeros(99), means))
-        plt.plot(means.numpy())
-    
-    plt.pause(0.001)
+        is_random_action = True
+        return torch.randint(0, 6, (1, 1), device=device, dtype=torch.long)
 
 def optimize_model():
     if len(memory) < BATCH_SIZE:
@@ -375,7 +362,7 @@ def optimize_model():
         next_state_values[non_final_mask] = target_net(non_final_next_states).max(1).values
     expected_state_action_values = (next_state_values * GAMMA) + reward_batch
 
-    criterion = nn.smoothL1Loss()
+    criterion = nn.SmoothL1Loss()
     loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
 
     optimizer.zero_grad()
@@ -384,27 +371,29 @@ def optimize_model():
     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     optimizer.step()
 
-num_episodes = 10
+num_episodes = 50
 
 for i_episode in range(num_episodes):
     env.reset()
     state = env.get_state()
-    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0)
+    state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(1)
     for t in count():
-        time.sleep(0.017)
         action = select_action(state)
-        if(action[0] == 3):
-            action[0] = 6
-        reward = env.do_game_tick(action[0])
+        executed_action = action.item()
+        if(executed_action == 3):
+            executed_action = 6
+        reward, terminated = env.do_game_tick(executed_action)
         print(env.get_display())
-        terminated = reward == -50
+        print("Action: ", executed_action)
+        print("Reward: ", reward)
+        print("Random Action: ", is_random_action)
         observation = env.get_state()
         reward = torch.tensor([reward], device=device)
 
         if terminated:
             next_state = None
         else:
-            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
+            next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(1)
         
         memory.push(state, action, next_state, reward)
         state = next_state
@@ -417,11 +406,7 @@ for i_episode in range(num_episodes):
         target_net.load_state_dict(target_net_state_dict)
 
         if terminated:
-            episode_durations.append(t+1)
-            plot_durations()
             break
 
 print('Complete')
-plot_durations(show_result=True)
-plot.ioff()
-plot.show()
+torch.save(policy_net.state_dict(), "saved_models/test1.pth")
