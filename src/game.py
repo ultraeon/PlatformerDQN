@@ -4,10 +4,10 @@ import random
 class Player():
     WIDTH = 1000
     HEIGHT = 1000
-    MOVE_ACCEL = 3
+    MOVE_ACCEL = 6
     JUMP_ACCEL = 350
     GRAV_ACCEL = 15
-    FRIC_ACCEL = 0.95
+    FRIC_ACCEL = 3
 
     def __init__(self):
         self.position_x = 0
@@ -38,8 +38,12 @@ class Player():
 
         if(self.state == 0):
             self.velocity_y -= Player.GRAV_ACCEL
-        if((not right_pressed and self.velocity_x > 0) or (not left_pressed and self.velocity_x < 0)):
-            self.velocity_x *= Player.FRIC_ACCEL
+        if(self.velocity_x < 3 and self.velocity_x > -3):
+            self.velocity_x = 0
+        elif(self.velocity_x > 0):
+            self.velocity_x -= Player.FRIC_ACCEL
+        else:
+            self.velocity_x += Player.FRIC_ACCEL
 
         self.velocity_x = min(self.velocity_x, 200)
         self.velocity_x = max(self.velocity_x, -200)
@@ -181,7 +185,7 @@ class GameHandler():
 
 class DisplayHandler():
 
-    def __init__(self, game, x_resolution=60, y_resolution=30, x_camera_range=14000, y_camera_range=10000):
+    def __init__(self, game, x_resolution=60, y_resolution=30, x_camera_range=16000, y_camera_range=14000):
         self.game = game
         self.x_resolution = x_resolution
         self.y_resolution = y_resolution
@@ -190,7 +194,7 @@ class DisplayHandler():
 
     def get_pixel_buffer(self):
         camera_x_center = self.game.player.position_x + 500
-        camera_y_center = self.game.player.position_y + 3000
+        camera_y_center = self.game.player.position_y + 1000
         pixel_buffer = [[0 for i in range(0, self.y_resolution)] for i in range(0, self.x_resolution)]
         for i in range(0, self.x_resolution):
             for j in range(0, self.y_resolution):
@@ -225,10 +229,12 @@ class Environment():
         self.filepath = filepath
         self.reset()
 
-    def reset(self):
+    def reset(self, isXRandom=True):
         randomX = 15000
         while not((randomX < 14000) or (randomX > 20000 and randomX < 32000) or (randomX > 47000 and randomX < 53000) or (randomX > 65000 and randomX < 70000) or (randomX > 95000)):
-            randomX = random.randint(2000, 110000)
+            randomX = random.randint(2000, 105000)
+        if not isXRandom:
+            randomX = 4000
 
         self.game = GameHandler(randomX, 22000)
         self.game.load_objects_from_text(self.filepath)

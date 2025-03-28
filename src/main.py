@@ -56,9 +56,9 @@ Transition = namedtuple('Transition', ('state', 'action', 'next_state', 'reward'
 
 BATCH_SIZE = 128
 GAMMA = 0.99
-EPS_START = 0.60
-EPS_END = 0.01
-EPS_DECAY = 20000
+EPS_START = 0.20
+EPS_END = 0.20
+EPS_DECAY = 1000
 TAU = 0.005
 LR = 1e-4
 
@@ -92,14 +92,14 @@ memory = ReplayMemory(10000)
 steps_done = 0
 is_random_action = False
 
-def select_action(state):
+def select_action(state, is_testing):
     global steps_done
     global is_random_action
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START-EPS_END) * \
         math.exp(-1*steps_done/EPS_DECAY)
     steps_done += 1
-    if sample > eps_threshold:
+    if sample > eps_threshold or is_testing:
         with torch.no_grad():
             is_random_action = False
             return policy_net(state).max(1).indices.view(1, 1)
@@ -136,13 +136,14 @@ def optimize_model():
     optimizer.step()
 
 num_episodes = (int)(input("How many episodes: "))
+is_training = input("Training Loop?(y/n): ") == "y"
 
 for i_episode in range(num_episodes):
-    env.reset()
+    env.reset(is_training)
     state = env.get_state()
     state = torch.tensor(state, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(1)
     for t in count():
-        action = select_action(state)
+        action = select_action(state, not is_training)
         executed_action = action.item()
         if(executed_action == 3):
             executed_action = 6
@@ -170,15 +171,16 @@ for i_episode in range(num_episodes):
 
         observation = env.get_state()
         reward = torch.tensor([reward], device=device)
-
+        
         if terminated:
             next_state = None
         else:
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0).unsqueeze(1)
-        
+ 
         memory.push(state, action, next_state, reward)
         state = next_state
-        optimize_model()
+        if is_training:
+            optimize_model()
 
         target_net_state_dict = target_net.state_dict()
         policy_net_state_dict = policy_net.state_dict()
@@ -188,9 +190,11 @@ for i_episode in range(num_episodes):
 
         if terminated:
             break
-    if (i_episode % 10) == 0:
-        torch.save(policy_net.state_dict(), backup_filepath + ".pth")
+
+    if (i_episode % 10) == 0 and is_training:
+        torch.save(policy_net.state_dict(), backup_filepath)
 
 print('Complete')
-model_save_pathway = input("Name the file where you are saving the model: ")
-torch.save(policy_net.state_dict(), "saved_models/" + model_save_pathway + ".pth")
+if is_training:
+    model_save_pathway = input("Name the file where you are saving the model: ")
+    torch.save(policy_net.state_dict(), "saved_models/" + model_save_pathway)
